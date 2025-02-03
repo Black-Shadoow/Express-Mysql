@@ -1,40 +1,30 @@
 const express = require('express');
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
-
-// Create Express app
 const app = express();
-const port = 3000;
+const conn = require('./models/db.model');
+const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON
-app.use(express.json());
+// Middleware
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
-// MySQL connection
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'testdb',
-});
 
-// Connect to MySQL
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to MySQL:', err);
-    return;
-  }
-  console.log('Connected to MySQL database!');
-});
-
-// Basic route
+// Routes
 app.get('/', (req, res) => {
-  res.send('Hello, babe! MySQL + Express is working!');
+    res.send("<h1>Hello from server</h1>");
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+
+app.post('/emp', (req, res) => {
+    const { name, email, position } = req.body;
+    const sql = 'INSERT INTO emp (name, email, position) VALUES (?, ?, ?)';
+    conn.query(sql, [name, email, position], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: 'Employee added successfully', id: result.insertId });
+    });
+});
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
