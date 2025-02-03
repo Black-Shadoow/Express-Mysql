@@ -23,7 +23,19 @@ app.post('/emp', (req, res) => {
         }
         res.json({ message: 'Employee added successfully', id: result.insertId });
     });
+    console.log("Executed Query:", sql, [name, email, position]);
 });
+app.get('/emp',(req,res)=>{
+    const sql = 'SELECT * FROM emp';
+    conn.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+})
+
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
