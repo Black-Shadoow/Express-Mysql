@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
     res.send("<h1>Hello from server</h1>");
 });
 
-
+//send data from user from database 
 app.post('/emp', (req, res) => {
     const { name, email, position } = req.body;
     const sql = 'INSERT INTO emp (name, email, position) VALUES (?, ?, ?)';
@@ -25,6 +25,7 @@ app.post('/emp', (req, res) => {
     });
     console.log("Executed Query:", sql, [name, email, position]);
 });
+//fetch data from database
 app.get('/emp',(req,res)=>{
     const sql = 'SELECT * FROM emp';
     conn.query(sql, (err, results) => {
@@ -34,7 +35,22 @@ app.get('/emp',(req,res)=>{
         res.json(results);
     });
 })
+// update databasee 
+app.put('/emp/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, email, position } = req.body;
 
+    const sql = 'UPDATE emp SET name = ?, email = ?, position = ? WHERE id = ?';
+    conn.query(sql, [name, email, position, id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+        res.json({ message: 'Employee updated successfully' });
+    });
+});
 
 // Start server
 app.listen(PORT, () => {
