@@ -51,6 +51,21 @@ app.put('/emp/:id', (req, res) => {
         res.json({ message: 'Employee updated successfully' });
     });
 });
+//delete
+app.delete('/emp/:id', (req, res) => {
+    const { id } = req.params;
+
+    const sql = 'DELETE FROM emp WHERE id = ?';
+    conn.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+        res.json({ message: 'Employee deleted successfully' });
+    });
+});
 
 // Start server
 app.listen(PORT, () => {
